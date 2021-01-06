@@ -18,6 +18,7 @@ use Hyperf\Framework\Event\BootApplication;
 use Hyperf\HttpServer\Router\DispatcherFactory;
 use Hyperf\HttpServer\Router\Handler;
 use Hyperf\Logger\LoggerFactory;
+use Hyperf\Server\Server;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Str;
 
@@ -49,22 +50,24 @@ class BootAppConfListener implements ListenerInterface
             $logger->warning('You have multiple serve, but your apidog.output_file not contains {server} var');
         }
         foreach ($servers as $server) {
-            $router = $container->get(DispatcherFactory::class)->getRouter($server['name']);
-            $data = $router->getData();
-            $swagger = new SwaggerJson($server['name']);
+            if($server['type'] != Server::SERVER_WEBSOCKET){
+                $router = $container->get(DispatcherFactory::class)->getRouter($server['name']);
+                $data = $router->getData();
+                $swagger = new SwaggerJson($server['name']);
 
-            $ignore = $config->get('apidog.ignore', function ($controller, $action) {
-                return false;
-            });
+                $ignore = $config->get('apidog.ignore', function ($controller, $action) {
+                    return false;
+                });
 
-            array_walk_recursive($data, function ($item) use ($swagger, $ignore) {
-                if ($item instanceof Handler && ! ($item->callback instanceof \Closure)) {
-                    [$controller, $action] = $this->prepareHandler($item->callback);
-                    (! $ignore($controller, $action)) && $swagger->addPath($controller, $action);
-                }
-            });
+                array_walk_recursive($data, function ($item) use ($swagger, $ignore) {
+                    if ($item instanceof Handler && ! ($item->callback instanceof \Closure)) {
+                        [$controller, $action] = $this->prepareHandler($item->callback);
+                        (! $ignore($controller, $action)) && $swagger->addPath($controller, $action);
+                    }
+                });
 
-            $swagger->save();
+                $swagger->save();
+            }
         }
     }
 
