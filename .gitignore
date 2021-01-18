@@ -10,3 +10,5 @@ composer.lock
 .idea
 ui/default/*.json
 ui/default/index.html
+
+.git

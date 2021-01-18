@@ -1,15 +1,9 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
-namespace Hyperf\Apidog\Validation;
+
+
+namespace Hyperf\Apidoc\Validation;
 
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Arr;
@@ -37,7 +31,7 @@ class Validation
     public function check($rules, $data, $obj = null)
     {
         foreach ($data as $key => $val) {
-            if (strpos((string) $key, '.') !== false) {
+            if (strpos((string)$key, '.') !== false) {
                 Arr::set($data, $key, $val);
                 unset($data[$key]);
             }
@@ -49,7 +43,7 @@ class Validation
         foreach ($rules as $key => $rule) {
             $field_extra = explode('|', $key);
             $field = $field_extra[0];
-            if (! $rule && Arr::get($data, $field)) {
+            if (!$rule && Arr::get($data, $field)) {
                 $white_data[$field] = Arr::get($data, $field);
                 continue;
             }
@@ -58,7 +52,7 @@ class Validation
             if (is_array($rule)) {
                 $has_required = Str::contains('required', json_encode($rule, JSON_UNESCAPED_UNICODE));
                 $sub_data = Arr::get($data, $field, []);
-                if ($has_required && ! $sub_data) {
+                if ($has_required && !$sub_data) {
                     return [null, [$title . '的子项是必须的']];
                 }
 
@@ -108,9 +102,19 @@ class Validation
         $validator->setPresenceVerifier($verifier);
 
         $fails = $validator->fails();
+
         $errors = [];
         if ($fails) {
-            $errors = $validator->errors()->all();
+            //$errors = $validator->errors()->all();
+            foreach ($validator->errors()->getMessages() as $column => $messages) {
+                // 多条错误信息
+                /*$errors[$column] = array_map(function ($message) {
+                    return $message;
+                }, $messages);*/
+
+                //单条错误
+                $errors[$column] = $messages[0];
+            }
 
             return [
                 null,
@@ -250,7 +254,7 @@ class Validation
                 $value = $this->parseData($value);
             }
 
-            if (Str::contains((string) $key, '->')) {
+            if (Str::contains((string)$key, '->')) {
                 $newData[str_replace('->', '.', $key)] = $value;
             } else {
                 $newData[$key] = $value;

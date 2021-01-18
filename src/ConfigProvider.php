@@ -1,15 +1,8 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
-namespace Hyperf\Apidog;
+
+namespace Hyperf\Apidoc;
 
 class ConfigProvider
 {
@@ -35,9 +28,9 @@ class ConfigProvider
             'publish' => [
                 [
                     'id' => 'config',
-                    'description' => 'The config for apidog.',
-                    'source' => __DIR__ . '/../publish/apidog.php',
-                    'destination' => BASE_PATH . '/config/autoload/apidog.php',
+                    'description' => 'The config for apidoc.',
+                    'source' => __DIR__ . '/../publish/apidoc.php',
+                    'destination' => BASE_PATH . '/config/autoload/apidoc.php',
                 ],
             ],
         ];

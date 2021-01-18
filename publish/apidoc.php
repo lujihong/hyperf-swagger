@@ -1,14 +1,6 @@
 <?php
-
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
+
 return [
     // enable false 将不会生成 swagger 文件
     'enable' => env('APP_ENV') !== 'production',
@@ -22,9 +14,9 @@ return [
     },
     // 自定义验证器错误码、错误描述字段
     'error_code' => 400,
-    'http_status_code' => 400,
+    'http_status_code' => 200,
     'field_error_code' => 'code',
-    'field_error_message' => 'message',
+    'field_error_message' => 'errors', //错误返回信息字段名
     'exception_enable' => false,
     // swagger 的基础配置
     'swagger' => [
@@ -34,7 +26,7 @@ return [
             'version' => '1.0.0',
             'title' => 'HYPERF API DOC',
         ],
-        'host' => 'apidog.cc',
+        'host' => 'apidoc.cc',
         'schemes' => ['http'],
     ],
     'templates' => [

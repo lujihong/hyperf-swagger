@@ -1,4 +1,6 @@
-## Api Watch Dog
+## 基于 composer daodao97/apidog 修改优化更好的适配后台前端使用
+
+## Api 生成
 一个 [Hyperf](https://github.com/hyperf/hyperf) 框架的 Api 参数校验及 swagger 文档生成组件
 
 1.  根据注解自动进行Api参数的校验, 业务代码更纯粹.
@@ -31,9 +33,9 @@ php bin/hyperf.php vendor:publish hyperf/validation
 > 
 > (1) 配置文件结构的优化, 增加了swagger外的整体配置
 >
-> (2) 配置文件的名称 由 swagger.php 改为 apidog.php
+> (2) 配置文件的名称 由 swagger.php 改为 apidoc.php
 
-根据需求修改 `config/autoload/apidog.php`
+根据需求修改 `config/autoload/apidoc.php`
 
 ```php
 <?php
@@ -51,7 +53,7 @@ return [
     },
     // 自定义验证器错误码、错误描述字段
     'error_code' => 400,
-    'http_status_code' => 400,
+    'http_status_code' => 200,
     'field_error_code' => 'code',
     'field_error_message' => 'message',
     'exception_enable' => false,
@@ -63,7 +65,7 @@ return [
             'version' => '1.0.0',
             'title' => 'HYPERF API DOC',
         ],
-        'host' => 'apidog.cc',
+        'host' => 'apidoc.cc',
         'schemes' => ['http'],
     ],
     'templates' => [
@@ -94,7 +96,7 @@ return [
 ```php
 // config/autoload/middlewares.php
 
-Hyperf\Apidog\Middleware\ApiValidationMiddleware::class
+Hyperf\Apidoc\Middleware\ApiValidationMiddleware::class
 ```
 
 ### 4. 校验规则的定义
@@ -109,7 +111,7 @@ Hyperf\Apidog\Middleware\ApiValidationMiddleware::class
 
 api参数的自动校验: 通过中间件拦截 http 请求, 根据注解中的参数定义, 通过 `valiation` 自动验证和过滤, 如果验证失败, 则拦截请求. 其中`valiation` 包含 规则校验, 参数过滤, 自定义校验 三部分. 
 
-swagger文档生成: 在`php bin/hyperf.php start` 启动 `http-server` 时, 通过监听 `BootAppConfListener` 事件, 扫码控制器注解, 通过注解中的 访问类型, 参数格式, 返回类型 等, 自动组装 `swagger.json` 结构, 最后输出到 `config/autoload/apidog.php` 定义的文件路径中
+swagger文档生成: 在`php bin/hyperf.php start` 启动 `http-server` 时, 通过监听 `BootAppConfListener` 事件, 扫码控制器注解, 通过注解中的 访问类型, 参数格式, 返回类型 等, 自动组装 `swagger.json` 结构, 最后输出到 `config/autoload/apidoc.php` 定义的文件路径中
 
 ## 支持的注解 
 
@@ -153,16 +155,16 @@ class UserController {}
 declare(strict_types=1);
 namespace App\Controller;
 
-use Hyperf\Apidog\Annotation\ApiController;
-use Hyperf\Apidog\Annotation\ApiResponse;
-use Hyperf\Apidog\Annotation\ApiVersion;
-use Hyperf\Apidog\Annotation\Body;
-use Hyperf\Apidog\Annotation\DeleteApi;
-use Hyperf\Apidog\Annotation\FormData;
-use Hyperf\Apidog\Annotation\GetApi;
-use Hyperf\Apidog\Annotation\Header;
-use Hyperf\Apidog\Annotation\PostApi;
-use Hyperf\Apidog\Annotation\Query;
+use Hyperf\Apidoc\Annotation\ApiController;
+use Hyperf\Apidoc\Annotation\ApiResponse;
+use Hyperf\Apidoc\Annotation\ApiVersion;
+use Hyperf\Apidoc\Annotation\Body;
+use Hyperf\Apidoc\Annotation\DeleteApi;
+use Hyperf\Apidoc\Annotation\FormData;
+use Hyperf\Apidoc\Annotation\GetApi;
+use Hyperf\Apidoc\Annotation\Header;
+use Hyperf\Apidoc\Annotation\PostApi;
+use Hyperf\Apidoc\Annotation\Query;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\Utils\ApplicationContext;
 
@@ -316,7 +318,7 @@ class DemoController extends AuthController
 ## Swagger UI启动
 
 本组件提供了两种方式来启用`SwaggerUI`
-, 当`config/autoload/apidog.php enable = true` 时
+, 当`config/autoload/apidoc.php enable = true` 时
 
 #### 方式一 
 
@@ -327,9 +329,9 @@ class DemoController extends AuthController
 也可以使用组件提供的快捷命令, 快速启动一个 `swagger ui`.
 
 ```bash
-php bin/hyperf.php apidog:ui
+php bin/hyperf.php apidoc:ui
 
-php bin/hyperf.php apidog:ui --port 8888
+php bin/hyperf.php apidoc:ui --port 8888
 ```
 
 ![hMvJnQ](https://gitee.com/daodao97/asset/raw/master/imgs/hMvJnQ.jpg)
@@ -337,34 +339,3 @@ php bin/hyperf.php apidog:ui --port 8888
 ## Swagger展示
 
 ![AOFVzI](https://gitee.com/daodao97/asset/raw/master/imgs/AOFVzI.jpg)
-
-## 更新日志
-- 20201230
-  - 支持 hyperf 2.1 版本
-  - 修复 `@Header` 参数名被底层转换为全小写导致的验证无效
-- 20201126 
-  - 统一 `version`, `prefix`, `path` 的前缀处理逻辑 [issue/42](https://github.com/daodao97/apidog/issues/42)
-- 20201111 [@ice](https://github.com/ice-leng)
-  - 修复 初始化 swagger.json  文件生成
-  - 修复 definition 在swagger ui 正确显示 定义数据类型
-  - 添加 注解 Header ，Query 支持 类 注解
-  - 添加 FormData 注解 key 参数 支持 a.b 验证 swagger ui 支持
-  - 添加 Body 注解 支持 参数 a.b  和 a.*.b 验证 swagger ui 支持
-  - 修复 definition 返回 参数为 小数在 swagger ui 不显示问题
-  - 添加 异常 ApiDogException 抛出，以及配置 异常抛出开关
-  - 添加 返回数据 模版 
-- 20201014
-    - 优化swagger ui, 命令模式监听`0.0.0.0`, 并支持自定义端口
-- 20200911
-    - Response 增加纯列表模式 [@zxyfaxcn](https://github.com/zxyfaxcn)
-- 20200904
-    - 增加 `ApiDefinitions` 与 `ApiDefinition` 注解，可用于相同Response结构体复用 [@jobinli](https://github.com/jobinli)
-    - `ApiResponse schema` 增加 `$ref` 属性，用于指定由 `ApiDefinition` 定义的结构体 [@jobinli](https://github.com/jobinli)
-- 20200813
-    - 增加Api版本, `ApiVersion`, 可以给路由增加版本前缀
-    - 增加多服务支持, `ApiServer`, 可以按服务生成`swagger.json`
-    - `ApiResponse shema` 支持字段简介
-- 20200812
-    - `body` 结构增加多级支持
-    - `FormData` 增加 文件上传样例
-    - 增加`swagger ui`命令行工具

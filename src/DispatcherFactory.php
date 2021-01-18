@@ -1,18 +1,11 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
-namespace Hyperf\Apidog;
 
-use Hyperf\Apidog\Annotation\ApiController;
-use Hyperf\Apidog\Annotation\ApiVersion;
+namespace Hyperf\Apidoc;
+
+use Hyperf\Apidoc\Annotation\ApiController;
+use Hyperf\Apidoc\Annotation\ApiVersion;
 use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Mapping;
@@ -22,7 +15,7 @@ class DispatcherFactory extends HyperfDispatcherFactory
 {
     protected function handleController(string $className, Controller $annotation, array $methodMetadata, array $middlewares = []): void
     {
-        if (! $methodMetadata) {
+        if (!$methodMetadata) {
             return;
         }
         $router = $this->getRouter($annotation->server);
@@ -38,10 +31,10 @@ class DispatcherFactory extends HyperfDispatcherFactory
             }
 
             foreach ($values as $mapping) {
-                if (! ($mapping instanceof Mapping)) {
+                if (!($mapping instanceof Mapping)) {
                     continue;
                 }
-                if (! isset($mapping->methods)) {
+                if (!isset($mapping->methods)) {
                     continue;
                 }
 

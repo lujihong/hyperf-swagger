@@ -1,21 +1,14 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
-namespace Hyperf\Apidog\Validation;
 
-use Hyperf\Apidog\Annotation\Body;
-use Hyperf\Apidog\Annotation\FormData;
-use Hyperf\Apidog\Annotation\Header;
-use Hyperf\Apidog\Annotation\Query;
-use Hyperf\Apidog\ApiAnnotation;
+namespace Hyperf\Apidoc\Validation;
+
+use Hyperf\Apidoc\Annotation\Body;
+use Hyperf\Apidoc\Annotation\FormData;
+use Hyperf\Apidoc\Annotation\Header;
+use Hyperf\Apidoc\Annotation\Query;
+use Hyperf\Apidoc\ApiAnnotation;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\Utils\ApplicationContext;
@@ -61,9 +54,9 @@ class ValidationApi
         }
 
         $config = make(ConfigInterface::class);
-        $error_code = $config->get('apidog.error_code', -1);
-        $field_error_code = $config->get('apidog.field_error_code', 'code');
-        $field_error_message = $config->get('apidog.field_error_message', 'message');
+        $error_code = $config->get('apidoc.error_code', -1);
+        $field_error_code = $config->get('apidoc.field_error_code', 'code');
+        $field_error_message = $config->get('apidoc.field_error_message', 'message');
 
         if ($header_rules) {
             $headers = $request->getHeaders();
@@ -81,7 +74,7 @@ class ValidationApi
             if ($data === null) {
                 return [
                     $field_error_code => $error_code,
-                    $field_error_message => implode(PHP_EOL, $error),
+                    $field_error_message => $error,
                 ];
             }
         }
@@ -94,7 +87,7 @@ class ValidationApi
             if ($data === null) {
                 return [
                     $field_error_code => $error_code,
-                    $field_error_message => implode(PHP_EOL, $error),
+                    $field_error_message => $error,
                 ];
             }
             Context::set(ServerRequestInterface::class, $request->withQueryParams($data));
@@ -108,7 +101,7 @@ class ValidationApi
             if ($data === null) {
                 return [
                     $field_error_code => $error_code,
-                    $field_error_message => implode(PHP_EOL, $error),
+                    $field_error_message => $error,
                 ];
             }
             Context::set(ServerRequestInterface::class, $request->withBody(new SwooleStream(json_encode($data))));
@@ -122,7 +115,7 @@ class ValidationApi
             if ($data === null) {
                 return [
                     $field_error_code => $error_code,
-                    $field_error_message => implode(PHP_EOL, $error),
+                    $field_error_message => $error,
                 ];
             }
             Context::set(ServerRequestInterface::class, $request->withParsedBody($data));
