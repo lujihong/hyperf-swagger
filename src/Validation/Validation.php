@@ -30,7 +30,7 @@ class Validation
      * 收集的自定义验证规则验证器
      * @var array
      */
-    public $validationRules;
+    public $validationRules = [];
 
     public function __construct()
     {
@@ -99,7 +99,6 @@ class Validation
                 if ($item == 'json') {
                     $item = 'array';
                 }
-
                 if (method_exists($this, $item)) {
                     $item = $this->makeCustomRule($item, $this);
                 } elseif (method_exists($this->customValidateRules, $item)) {

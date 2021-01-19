@@ -189,6 +189,7 @@ use Hyperf\Apidoc\Annotation\FormData;
 use Hyperf\Apidoc\Annotation\GetApi;
 use Hyperf\Apidoc\Annotation\Header;
 use Hyperf\Apidoc\Annotation\PostApi;
+use Hyperf\Apidoc\Annotation\RequestApi;
 use Hyperf\Apidoc\Annotation\Query;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\Utils\ApplicationContext;
@@ -217,6 +218,20 @@ use Hyperf\Utils\ApplicationContext;
  */
 class DemoController extends AuthController
 {
+
+    /**
+     * 默认不定义 methods 默认值 get,post 不区分大小写
+     * @RequestApi(path="/test", summary="测试", methods="post, get, put, delete")
+     * @ApiResponse(code="200", description="ok", schema={{
+     *     "a|aa": {{
+     *          "a|aaa":"b","c|ccc":5.2
+     *      }},
+     *     "b|ids": {1,2,3},
+     *     "c|strings": {"a","b","c"},
+     *     "d|dd": {"a":"b","c":"d"},
+     *     "e|ee": "f"
+     * }})
+     */
 
     /**
      * @PostApi(path="/demo", description="添加一个用户")
