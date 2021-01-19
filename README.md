@@ -148,8 +148,33 @@ class UserController {}
 
 具体使用方式参见下方样例
 
-## 样例
+## 【新增】自定义规则创建
+```php
+<?php
+declare(strict_types=1);
+namespace App\Test;
 
+use Hyperf\Apidoc\Annotation\ValidationRule;
+
+/**
+ * 在任意位置创建规则类
+ * @ValidationRule()
+ */
+class TestRute
+{
+    /**
+     * @param $attribute 属性
+     * @param $value 属性值
+     * @return bool|string 校验错误则返回错误信息, 正确则返回 true
+     */
+    public function test($attribute, $value)
+    {
+        return '这是test';
+    }
+}
+```
+
+## 样例
 ```php
 <?php
 declare(strict_types=1);

@@ -7,21 +7,16 @@ namespace Hyperf\Apidoc\Validation;
 class ValidationCustomRule
 {
     /**
-     * @param mixed $attribute 属性
-     * @param mixed $value 属性值
-     *
-     * @return bool | string 校验错误则返回错误信息, 正确则返回 true
+     * @param $attribute 属性
+     * @param $value 属性值
+     * @return bool|string 校验错误则返回错误信息, 正确则返回 true
      */
-    public function test($attribute, $value)
-    {
-        return '自定义错误';
-    }
-
     public function phone($attribute, $value)
     {
         if (! preg_match('/^1[3456789]{1}\d{9}$/', trim($value))) {
             return '手机号不合法';
         }
+
         return true;
     }
 
@@ -32,6 +27,7 @@ class ValidationCustomRule
                 return '不是合法的crontab配置';
             }
         }
+
         return true;
     }
 
@@ -40,6 +36,7 @@ class ValidationCustomRule
         if (! class_exists((string) $value)) {
             return '类名不存在';
         }
+
         return true;
     }
 

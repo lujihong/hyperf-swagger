@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-
 namespace Hyperf\Apidoc\Validation;
 
+use Hyperf\Apidoc\Annotation\ValidationRule;
+use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Arr;
 use Hyperf\Utils\Str;
@@ -19,13 +20,27 @@ class Validation
     /** @var ValidatorFactory */
     public $factory;
 
+    /**
+     * 内置验证规则
+     * @var ValidationCustomRule|mixed
+     */
     public $customValidateRules;
+
+    /**
+     * 收集的自定义验证规则验证器
+     * @var array
+     */
+    public $validationRules;
 
     public function __construct()
     {
         $this->container = ApplicationContext::getContainer();
         $this->factory = $this->container->get(ValidatorFactory::class);
         $this->customValidateRules = $this->container->get(ValidationCustomRule::class);
+        $validationRules = AnnotationCollector::getClassByAnnotation(ValidationRule::class);
+        foreach ($validationRules as $class => $obj) {
+            $this->validationRules[] = new $class;
+        }
     }
 
     public function check($rules, $data, $obj = null)
@@ -79,17 +94,26 @@ class Validation
                 continue;
             }
             $_rules = explode('|', $rule);
+
             foreach ($_rules as $index => &$item) {
                 if ($item == 'json') {
                     $item = 'array';
                 }
+
                 if (method_exists($this, $item)) {
                     $item = $this->makeCustomRule($item, $this);
                 } elseif (method_exists($this->customValidateRules, $item)) {
                     $item = $this->makeCustomRule($item, $this->customValidateRules);
                 } elseif (is_string($item) && Str::startsWith($item, 'cb_')) {
                     $item = $this->makeObjectCallback(Str::replaceFirst('cb_', '', $item), $obj);
+                } else {
+                    foreach ($this->validationRules as $validationRule) {
+                        if (method_exists($validationRule, $item)) {
+                            $item = $this->makeCustomRule($item, $validationRule);
+                        }
+                    }
                 }
+
                 unset($item);
             }
             $real_rules[$field] = $_rules;
