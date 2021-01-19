@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Hyperf\Apidoc\Middleware;
 
 use FastRoute\Dispatcher;
-use Hyperf\Apidoc\Exception\ApiDogException;
+use Hyperf\Apidoc\Exception\ApiDocException;
 use Hyperf\Apidoc\Validation\ValidationApi;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -62,7 +62,7 @@ class ApiValidationMiddleware extends CoreMiddleware
             $exceptionEnable = $config->get('apidoc.exception_enable', false);
             if ($exceptionEnable) {
                 $fieldErrorMessage = $config->get('apidoc.field_error_message', 'message');
-                throw new ApiDogException($result[$fieldErrorMessage]);
+                throw new ApiDocException($result[$fieldErrorMessage]);
             }
             $httpStatusCode = $config->get('apidoc.http_status_code', 400);
             return $this->response->json($result)->withStatus($httpStatusCode);
