@@ -5,6 +5,7 @@
 
 1.  根据注解自动进行Api参数的校验, 业务代码更纯粹.
 2.  根据注解自动生成Swagger文档, 让接口文档维护更省心.
+3.  基于daodao97/apidog组件修改，新增RequestApi，注解自定义规则，修改返回的验证结果message换行符修改未增加对应的字段名
 
 > 在 1.2 版本后, 本扩展移除了内部自定义的验证器, 只保留的 hyperf 原生验证器, 以保持验证规则的统一
 
@@ -116,10 +117,13 @@ swagger文档生成: 在`php bin/hyperf.php start` 启动 `http-server` 时, 通
 ## 支持的注解 
 
 #### Api类型
-`GetApi`, `PostApi`, `PutApi`, `DeleteApi`
+`GetApi`, `PostApi`, `PutApi`, `DeleteApi`, `RequestApi`
 
 ### 参数类型
 `Header`, `Quyer`, `Body`, `FormData`, `Path`
+
+### 自定义验证规则
+`ValidationRule`
 
 ### 其他
 `ApiController`, `ApiResponse`, `ApiVersion`, `ApiServer`, `ApiDefinitions`, `ApiDefinition`
@@ -232,6 +236,10 @@ class DemoController extends AuthController
      *     "e|ee": "f"
      * }})
      */
+    public function test()
+    {
+    
+    }
 
     /**
      * @PostApi(path="/demo", description="添加一个用户")
