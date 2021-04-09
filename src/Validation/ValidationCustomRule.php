@@ -15,7 +15,7 @@ class ValidationCustomRule
     public function phone($attribute, $value)
     {
         if (! preg_match('/^1[3456789]{1}\d{9}$/', trim($value))) {
-            return '手机号不合法';
+            return '格式不正确';
         }
 
         return true;
@@ -31,7 +31,7 @@ class ValidationCustomRule
         $id = strtoupper($id);
         $regx = "/(^\d{15}$)|(^\d{17}([0-9]|X)$)/";
         $arr_split = [];
-        $errorMsg = '身份证号码不合法';
+        $errorMsg = '不合法';
         if (!preg_match($regx, $id)) {
             return $errorMsg;
         }

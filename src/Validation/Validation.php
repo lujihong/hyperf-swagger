@@ -63,12 +63,11 @@ class Validation
                 continue;
             }
             $title = $field_extra[1] ?? $field_extra[0];
-
             if (is_array($rule)) {
                 $has_required = Str::contains('required', json_encode($rule, JSON_UNESCAPED_UNICODE));
                 $sub_data = Arr::get($data, $field, []);
                 if ($has_required && !$sub_data) {
-                    return [null, [$title . '的子项是必须的']];
+                    return [null, [$title . ' 子项是必须的']];
                 }
 
                 // rule : {"field|字段":"required|***"}
@@ -94,21 +93,20 @@ class Validation
                 continue;
             }
             $_rules = explode('|', $rule);
-
             foreach ($_rules as $index => &$item) {
                 if ($item == 'json') {
                     $item = 'array';
                 }
                 if (method_exists($this, $item)) {
-                    $item = $this->makeCustomRule($item, $this);
+                    $item = $this->makeCustomRule($title, $item, $this);
                 } elseif (method_exists($this->customValidateRules, $item)) {
-                    $item = $this->makeCustomRule($item, $this->customValidateRules);
+                    $item = $this->makeCustomRule($title, $item, $this->customValidateRules);
                 } elseif (is_string($item) && Str::startsWith($item, 'cb_')) {
-                    $item = $this->makeObjectCallback(Str::replaceFirst('cb_', '', $item), $obj);
+                    $item = $this->makeObjectCallback($title, Str::replaceFirst('cb_', '', $item), $obj);
                 } else {
                     foreach ($this->validationRules as $validationRule) {
                         if (method_exists($validationRule, $item)) {
-                            $item = $this->makeCustomRule($item, $validationRule);
+                            $item = $this->makeCustomRule($title, $item, $validationRule);
                         }
                     }
                 }
@@ -162,9 +160,9 @@ class Validation
         ];
     }
 
-    public function makeCustomRule($custom_rule, $object)
+    public function makeCustomRule($field, $custom_rule, $object)
     {
-        return new class($custom_rule, $object) implements Rule {
+        return new class($field, $custom_rule, $object) implements Rule {
             public $custom_rule;
 
             public $validation;
@@ -173,8 +171,11 @@ class Validation
 
             public $attribute;
 
-            public function __construct($custom_rule, $validation)
+            public $field;
+
+            public function __construct($field, $custom_rule, $validation)
             {
+                $this->field = $field;
                 $this->custom_rule = $custom_rule;
                 $this->validation = $validation;
             }
@@ -207,14 +208,14 @@ class Validation
 
             public function message()
             {
-                return sprintf($this->error, $this->attribute);
+                return sprintf($this->error, $this->field);
             }
         };
     }
 
-    public function makeObjectCallback($method, $object)
+    public function makeObjectCallback($field, $method, $object)
     {
-        return new class($method, $this, $object) implements Rule {
+        return new class($field, $method, $this, $object) implements Rule {
             public $custom_rule;
 
             public $validation;
@@ -225,8 +226,11 @@ class Validation
 
             public $attribute;
 
-            public function __construct($custom_rule, $validation, $object)
+            public $field;
+
+            public function __construct($field, $custom_rule, $validation, $object)
             {
+                $this->field = $field;
                 $this->custom_rule = $custom_rule;
                 $this->validation = $validation;
                 $this->object = $object;
@@ -260,7 +264,7 @@ class Validation
 
             public function message()
             {
-                return sprintf($this->error, $this->attribute);
+                return sprintf($this->error, $this->field);
             }
         };
     }
