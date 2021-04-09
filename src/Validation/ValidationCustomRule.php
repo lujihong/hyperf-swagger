@@ -14,8 +14,23 @@ class ValidationCustomRule
      */
     public function phone($attribute, $value)
     {
-        if (! preg_match('/^1[3456789]{1}\d{9}$/', trim($value))) {
+        if (!preg_match('/^1[3456789]{1}\d{9}$/', trim($value))) {
             return '格式不正确';
+        }
+
+        return true;
+    }
+
+    /**
+     * 手机号码或座机号码验证
+     * @param $attribute 属性
+     * @param $value 属性值
+     * @return bool|string 校验错误则返回错误信息, 正确则返回 true
+     */
+    public function telephone($attribute, $value)
+    {
+        if (!preg_match('/^1[3456789]{1}\d{9}$/', trim($value)) && !preg_match('/^(0[0-9]{2,3}\-)?([2-9][0-9]{6,7})+(\-[0-9]{1,4})?$/', trim($value)) && !preg_match('/^(0[0-9]{2,3})?([2-9][0-9]{6,7})+(\-[0-9]{1,4})?$/', trim($value))) {
+            return '只能是有效的11位手机号码，或区号+座机号码+分机号（可带中划线分隔，分机号必须分隔）';
         }
 
         return true;
@@ -79,8 +94,8 @@ class ValidationCustomRule
 
     public function crontab($attribute, $value)
     {
-        if (! preg_match('/^((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)$/i', trim($value))) {
-            if (! preg_match('/^((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)$/i', trim($value))) {
+        if (!preg_match('/^((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)$/i', trim($value))) {
+            if (!preg_match('/^((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)\s+((\*(\/[0-9]+)?)|[0-9\-\,\/]+)$/i', trim($value))) {
                 return '不是合法的crontab配置';
             }
         }
@@ -90,7 +105,7 @@ class ValidationCustomRule
 
     public function class_exist($attribute, $value)
     {
-        if (! class_exists((string) $value)) {
+        if (!class_exists((string)$value)) {
             return '类名不存在';
         }
 
@@ -99,7 +114,7 @@ class ValidationCustomRule
 
     public function number_concat_ws_comma($attribute, $value)
     {
-        if (! preg_match('/^\\d+(,\\d+)*$/', $value)) {
+        if (!preg_match('/^\\d+(,\\d+)*$/', $value)) {
             return '不是英文逗号分隔的字符串';
         }
 
