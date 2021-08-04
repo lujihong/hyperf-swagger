@@ -1,17 +1,10 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
-namespace Hyperf\Apidog;
 
-use Hyperf\Apidog\Swagger\SwaggerJson;
+namespace Hyperf\Apidoc;
+
+use Hyperf\Apidoc\Swagger\SwaggerJson;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BootApplication;
@@ -34,20 +27,20 @@ class BootAppConfListener implements ListenerInterface
     public function process(object $event)
     {
         $container = ApplicationContext::getContainer();
-        $logger = $container->get(LoggerFactory::class)->get('apidog');
+        $logger = $container->get(LoggerFactory::class)->get('apidoc');
         $config = $container->get(ConfigInterface::class);
-        if (! $config->get('apidog.enable')) {
-            $logger->debug('apidog not enable');
+        if (! $config->get('apidoc.enable')) {
+            $logger->debug('apidoc not enable');
             return;
         }
-        $output = $config->get('apidog.output_file');
+        $output = $config->get('apidoc.output_file');
         if (! $output) {
-            $logger->error('/config/autoload/apidog.php need set output_file');
+            $logger->error('/config/autoload/apidoc.php need set output_file');
             return;
         }
         $servers = $config->get('server.servers');
         if (count($servers) > 1 && ! Str::contains($output, '{server}')) {
-            $logger->warning('You have multiple serve, but your apidog.output_file not contains {server} var');
+            $logger->warning('You have multiple serve, but your apidoc.output_file not contains {server} var');
         }
         foreach ($servers as $server) {
             if($server['type'] != Server::SERVER_WEBSOCKET){
@@ -55,7 +48,7 @@ class BootAppConfListener implements ListenerInterface
                 $data = $router->getData();
                 $swagger = new SwaggerJson($server['name']);
 
-                $ignore = $config->get('apidog.ignore', function ($controller, $action) {
+                $ignore = $config->get('apidoc.ignore', function ($controller, $action) {
                     return false;
                 });
 

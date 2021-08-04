@@ -10,7 +10,7 @@ use Hyperf\Di\Annotation\AbstractAnnotation;
  * @Annotation
  * @Target({"CLASS"})
  */
-class ApiVersion extends AbstractAnnotation
+class ValidationRule extends AbstractAnnotation
 {
-    public $version;
+
 }

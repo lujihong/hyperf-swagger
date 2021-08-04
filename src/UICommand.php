@@ -1,15 +1,8 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
-namespace Hyperf\Apidog;
+
+namespace Hyperf\Apidoc;
 
 use Hyperf\Command\Annotation\Command;
 use Hyperf\Command\Command as HyperfCommand;
@@ -22,7 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class UICommand extends HyperfCommand
 {
-    protected $name = 'apidog:ui';
+    protected $name = 'apidoc:ui';
 
     protected $coroutine = false;
 
@@ -31,7 +24,7 @@ class UICommand extends HyperfCommand
         $dir = __DIR__;
         $root = realpath($dir . '/../ui');
         $config = ApplicationContext::getContainer()->get(ConfigInterface::class);
-        $swagger_file = $config->get('apidog.output_file');
+        $swagger_file = $config->get('apidoc.output_file');
         $servers = $config->get('server.servers');
         $ui = 'default';
         $command = $this;
@@ -46,7 +39,7 @@ class UICommand extends HyperfCommand
         ]);
 
         $http->on('start', function ($server) use ($root, $swagger_file, $ui, $command, $host, $port, $servers) {
-            $command->output->success(sprintf('Apidog Swagger UI is started at http://%s:%s', $host, $port));
+            $command->output->success(sprintf('Apidoc Swagger UI is started at http://%s:%s', $host, $port));
             $command->output->text('I will open it in browser after 1 seconds');
 
             foreach ($servers as $index => $server) {
@@ -73,7 +66,7 @@ class UICommand extends HyperfCommand
 
         $http->on('request', function ($request, $response) {
             $response->header('Content-Type', 'text/plain');
-            $response->end("This is apidog server.\n");
+            $response->end("This is apidoc server.\n");
         });
         $http->start();
     }

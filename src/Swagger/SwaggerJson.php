@@ -1,29 +1,22 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
-namespace Hyperf\Apidog\Swagger;
+
+namespace Hyperf\Apidoc\Swagger;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Hyperf\Apidog\Annotation\ApiController;
-use Hyperf\Apidog\Annotation\ApiDefinition;
-use Hyperf\Apidog\Annotation\ApiDefinitions;
-use Hyperf\Apidog\Annotation\ApiResponse;
-use Hyperf\Apidog\Annotation\ApiServer;
-use Hyperf\Apidog\Annotation\ApiVersion;
-use Hyperf\Apidog\Annotation\Body;
-use Hyperf\Apidog\Annotation\FormData;
-use Hyperf\Apidog\Annotation\Header;
-use Hyperf\Apidog\Annotation\Param;
-use Hyperf\Apidog\Annotation\Query;
-use Hyperf\Apidog\ApiAnnotation;
+use Hyperf\Apidoc\Annotation\ApiController;
+use Hyperf\Apidoc\Annotation\ApiDefinition;
+use Hyperf\Apidoc\Annotation\ApiDefinitions;
+use Hyperf\Apidoc\Annotation\ApiResponse;
+use Hyperf\Apidoc\Annotation\ApiServer;
+use Hyperf\Apidoc\Annotation\ApiVersion;
+use Hyperf\Apidoc\Annotation\Body;
+use Hyperf\Apidoc\Annotation\FormData;
+use Hyperf\Apidoc\Annotation\Header;
+use Hyperf\Apidoc\Annotation\Param;
+use Hyperf\Apidoc\Annotation\Query;
+use Hyperf\Apidoc\ApiAnnotation;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\HttpServer\Annotation\Mapping;
 use Hyperf\Logger\LoggerFactory;
@@ -44,8 +37,8 @@ class SwaggerJson
     {
         $container = ApplicationContext::getContainer();
         $this->config = $container->get(ConfigInterface::class);
-        $this->logger = $container->get(LoggerFactory::class)->get('apidog');
-        $this->swagger = $this->config->get('apidog.swagger');
+        $this->logger = $container->get(LoggerFactory::class)->get('apidoc');
+        $this->swagger = $this->config->get('apidoc.swagger');
         $this->server = $server;
     }
 
@@ -89,7 +82,7 @@ class SwaggerJson
         }
         $params = [];
         $responses = [];
-        /** @var \Hyperf\Apidog\Annotation\GetApi $mapping */
+        /** @var \Hyperf\Apidoc\Annotation\GetApi $mapping */
         $mapping = null;
         $consumes = null;
         foreach ($methodAnnotations as $option) {
@@ -171,7 +164,7 @@ class SwaggerJson
         $method = ucfirst($method);
         $path = str_replace(['{', '}'], '', $path);
         $parameters = [];
-        /** @var \Hyperf\Apidog\Annotation\Query $item */
+        /** @var \Hyperf\Apidoc\Annotation\Query $item */
         foreach ($params as $item) {
             if ($item->rule !== null && in_array('array', explode('|', $item->rule))) {
                 $item->name .= '[]';
@@ -209,7 +202,7 @@ class SwaggerJson
     public function makeResponses($responses, $path, $method)
     {
         $path = str_replace(['{', '}'], '', $path);
-        $templates = $this->config->get('apidog.templates', []);
+        $templates = $this->config->get('apidoc.templates', []);
 
         $resp = [];
         /** @var ApiResponse $item */
@@ -399,9 +392,9 @@ class SwaggerJson
     public function save()
     {
         $this->swagger['tags'] = array_values($this->swagger['tags'] ?? []);
-        $outputFile = $this->config->get('apidog.output_file');
+        $outputFile = $this->config->get('apidoc.output_file');
         if (! $outputFile) {
-            $this->logger->error('/config/autoload/apidog.php need set output_file');
+            $this->logger->error('/config/autoload/apidoc.php need set output_file');
             return;
         }
         $outputFile = str_replace('{server}', $this->server, $outputFile);
