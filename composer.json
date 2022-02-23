@@ -13,10 +13,10 @@
     "require": {
         "php": ">=7.3",
         "ext-json": "*",
-        "hyperf/command": "2.1.*",
-        "hyperf/http-server": "2.1.*",
-        "hyperf/logger": "2.1.*",
-        "hyperf/validation": "2.1.*"
+        "hyperf/command": "2.2.*",
+        "hyperf/http-server": "2.2.*",
+        "hyperf/logger": "2.2.*",
+        "hyperf/validation": "2.2.*"
     },
     "autoload": {
         "psr-4": {
