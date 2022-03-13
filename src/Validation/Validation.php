@@ -15,16 +15,21 @@ use Hyperf\Validation\ValidatorFactory;
 
 class Validation
 {
+    /**
+     * @var \Psr\Container\ContainerInterface
+     */
     public $container;
 
-    /** @var ValidatorFactory */
-    public $factory;
+    /**
+     * @var ValidatorFactory|mixed
+     */
+    public ValidatorFactory $factory;
 
     /**
      * 内置验证规则
      * @var ValidationCustomRule|mixed
      */
-    public $customValidateRules;
+    public ValidationCustomRule $customValidateRules;
 
     /**
      * 收集的自定义验证规则验证器

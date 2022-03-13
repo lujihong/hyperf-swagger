@@ -6,17 +6,17 @@ namespace Hyperf\Apidoc\Annotation;
 
 use Hyperf\Di\Annotation\AbstractAnnotation;
 
-/**
- * @Annotation
- * @Target({"CLASS"})
- */
+#[Attribute(Attribute::TARGET_CLASS)]
 class ApiDefinitions extends AbstractAnnotation
 {
     /**
      * @var array
      */
-    public $definitions;
+    public array $definitions;
 
+    /**
+     * @param $value
+     */
     public function __construct($value = null)
     {
         $this->bindMainProperty('definitions', $value);

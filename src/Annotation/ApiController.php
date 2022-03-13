@@ -6,26 +6,23 @@ namespace Hyperf\Apidoc\Annotation;
 
 use Hyperf\HttpServer\Annotation\Controller;
 
-/**
- * @Annotation
- * @Target({"CLASS"})
- */
+#[Attribute(Attribute::TARGET_CLASS)]
 class ApiController extends Controller
 {
     public $tag;
 
     /**
-     * @var null|string
+     * @var string|null
      */
-    public $prefix = '';
+    public string|null $prefix = '';
 
     /**
      * @var string
      */
-    public $server = 'http';
+    public string $server = 'http';
 
     /**
      * @var string
      */
-    public $description = '';
+    public string $description = '';
 }

@@ -102,6 +102,9 @@ class SwaggerJson
                 $consumes = 'application/json';
             }
         }
+        if ($mapping === null) {
+            return;
+        }
         $this->makeDefinition($definitionsAnno);
         $definitionAnno && $this->makeDefinition([$definitionAnno]);
 
@@ -158,12 +161,43 @@ class SwaggerJson
         return 'string';
     }
 
+    public function paramObj($in, $value) {
+        if ($in == 'body') {
+            return new Body($value);
+        }
+        return new class($value) extends Param{};
+    }
+
+    public function golbalParams(): array
+    {
+        $conf_global = $this->config->get("apidoc.global", []);
+        $global_params = [];
+        foreach ($conf_global as $in => $items) {
+            if (isset($items[0])) {
+                foreach ($items as $item) {
+                    $global_params[] = $this->paramObj($in, $item);
+                }
+            } else {
+                foreach ($items as $name => $rule) {
+                    $value = [
+                        'in' => $in,
+                        'key' => $name,
+                        'rule' => $rule
+                    ];
+                    $global_params[] = $this->paramObj($in, $value);
+                }
+            }
+
+        }
+        return $global_params;
+    }
     public function makeParameters($params, $path, $method)
     {
         $this->initModel();
         $method = ucfirst($method);
         $path = str_replace(['{', '}'], '', $path);
         $parameters = [];
+        $params = array_merge($params, $this->golbalParams());
         /** @var \Hyperf\Apidoc\Annotation\Query $item */
         foreach ($params as $item) {
             if ($item->rule !== null && in_array('array', explode('|', $item->rule))) {
@@ -381,7 +415,7 @@ class SwaggerJson
         $pathInfo = pathinfo($file);
         if (! empty($pathInfo['dirname'])) {
             if (file_exists($pathInfo['dirname']) === false) {
-                if (mkdir($pathInfo['dirname'], 0644, true) === false) {
+                if (mkdir($pathInfo['dirname'], 0644, true) && chmod($pathInfo['dirname'], 0644)) {
                     return false;
                 }
             }
@@ -425,6 +459,9 @@ class SwaggerJson
 
     private function rules2schema($name, $rules)
     {
+        if (!$rules) {
+            return;
+        }
         $schema = [
             'type' => 'object',
             'properties' => [],

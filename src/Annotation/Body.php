@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Hyperf\Apidoc\Annotation;
 
-/**
- * @Annotation
- * @Target({"METHOD"})
- */
+#[Attribute(Attribute::TARGET_METHOD)]
 class Body extends Param
 {
     public $in = 'body';

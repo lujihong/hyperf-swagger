@@ -10,9 +10,7 @@ use Hyperf\Contract\ConfigInterface;
 use Hyperf\Utils\ApplicationContext;
 use Symfony\Component\Console\Input\InputOption;
 
-/**
- * @Command
- */
+#[Command]
 class UICommand extends HyperfCommand
 {
     protected $name = 'apidoc:ui';

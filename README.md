@@ -43,7 +43,7 @@ php bin/hyperf.php vendor:publish hyperf/validation
 
 return [
     // enable false 将不会生成 swagger 文件
-    'enable' => env('APP_ENV') !== 'production',
+    'enable' => env('APP_ENV') !== 'prod',
     // swagger 配置的输出文件
     // 当你有多个 http server 时, 可以在输出文件的名称中增加 {server} 字面变量
     // 比如 /public/swagger/swagger_{server}.json
@@ -67,7 +67,7 @@ return [
             'title' => 'HYPERF API DOC',
         ],
         'host' => 'apidoc.cc',
-        'schemes' => ['http'],
+        'schemes' => ['http', 'https'],
     ],
     'templates' => [
         // {template} 字面变量  替换 schema 内容
@@ -89,6 +89,24 @@ return [
 //            "message|message" => 'Success',
 //        ],
     ],
+    // golbal 节点 为全局性的 参数配置
+    // 跟注解相同, 支持 header, path, query, body, formData
+    // 子项为具体定义
+    // 模式一: [ key => rule ]
+    // 模式二: [ [key, rule, defautl, description] ]
+    'global' => [
+        // 'header' => [
+        //     "x-token|验签" => "required|cb_token"
+        // ],
+        // 'query' => [
+        //     [
+        //         'key' => 'xx|cc',
+        //         'rule' => 'required',
+        //         'default' => 'abc',
+        //         'description' => 'description'
+        //     ]
+        // ]
+    ]
 ];
 ```
 
@@ -120,7 +138,7 @@ swagger文档生成: 在`php bin/hyperf.php start` 启动 `http-server` 时, 通
 `GetApi`, `PostApi`, `PutApi`, `DeleteApi`, `RequestApi`
 
 ### 参数类型
-`Header`, `Quyer`, `Body`, `FormData`, `Path`
+`Header`, `Query`, `Body`, `FormData`, `Path`
 
 ### 自定义验证规则
 `ValidationRule`
@@ -162,8 +180,9 @@ use Hyperf\Apidoc\Annotation\ValidationRule;
 
 /**
  * 在任意位置创建规则类
- * @ValidationRule()
  */
+
+#[ValidationRule()]
 class TestRute
 {
     /**
@@ -217,14 +236,12 @@ use Hyperf\Utils\ApplicationContext;
  *     "avatar": { "default": "avatar", "type": "string", "description": "用户头像" },
  *  })
  * })
- *
- * @RouterAuthAnnotation(isPublic=true)
  */
 class DemoController extends AuthController
 {
 
     /**
-     * 默认不定义 methods 默认值 get,post 不区分大小写
+     * 默认不定义 methods 默认值 post, get, put, delete 不区分大小写
      * @RequestApi(path="/test", summary="测试", methods="post, get, put, delete")
      * @ApiResponse(code="200", description="ok", schema={{
      *     "a|aa": {{
@@ -250,7 +267,6 @@ class DemoController extends AuthController
      * @FormData(key="file|文件", rule="file")
      * @ApiResponse(code="-1", description="参数错误", template="page")
      * @ApiResponse(code="0", description="请求成功", schema={"id":"1"})
-     *
      */
     public function add()
     {

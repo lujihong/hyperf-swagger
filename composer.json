@@ -11,12 +11,12 @@
     "support": {
     },
     "require": {
-        "php": ">=7.3",
+        "php": ">=8.0",
         "ext-json": "*",
-        "hyperf/command": "2.2.*",
-        "hyperf/http-server": "2.2.*",
-        "hyperf/logger": "2.2.*",
-        "hyperf/validation": "2.2.*"
+        "hyperf/command": "~2.2.0|~3.0.0",
+        "hyperf/http-server": "~2.2.0|~3.0.0",
+        "hyperf/logger": "~2.2.0|~3.0.0",
+        "hyperf/validation": "~2.2.0|~3.0.0"
     },
     "autoload": {
         "psr-4": {

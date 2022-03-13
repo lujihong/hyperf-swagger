@@ -17,19 +17,92 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class ValidationApi
 {
+    /**
+     * @var Validation|mixed
+     */
     public $validation;
 
+    /**
+     * @var \Psr\Container\ContainerInterface
+     */
+    public $container;
+
+    /**
+     * @var ConfigInterface|mixed
+     */
+    public $config;
+
+    /**
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
     public function __construct()
     {
         $this->validation = make(Validation::class);
+        $this->container = ApplicationContext::getContainer();
+        $this->config = $this->container->get(ConfigInterface::class);
+    }
+
+    /**
+     * @param $in
+     * @param $value
+     * @return Body|FormData|Header|Query|null
+     */
+    public function paramObj($in, $value)
+    {
+        switch ($in) {
+            case 'query':
+                return new Query($value);
+            case 'formData':
+                return new FormData($value);
+            case 'header':
+                return new Header($value);
+            case 'body':
+                return new Body($value);
+        }
+        return null;
+    }
+
+    public function globalParams(): array
+    {
+        $conf = $this->config->get('apidoc.global', []);
+        $globalAnno = [];
+        foreach ($conf as $in => $params) {
+            $paramsObj = [];
+            if (isset($params[0])) {
+                foreach ($params as $param) {
+                    $paramsObj[] = $this->paramObj($in, $param);
+                }
+            } else {
+                if ($in == 'body') {
+                    $globalAnno[] = $this->paramObj($in, [
+                        'in' => $in,
+                        'rules' => $params
+                    ]);
+                } else {
+                    foreach ($params as $key => $rule) {
+                        $paramsObj[] = $this->paramObj($in, [
+                            'in' => $in,
+                            'key' => $key,
+                            'rule' => $rule
+                        ]);
+                    }
+                }
+            }
+            $globalAnno[] = array_filter($paramsObj);
+        }
+
+        return $globalAnno;
     }
 
     public function validated($controller, $action)
     {
-        $container = ApplicationContext::getContainer();
-        $controllerInstance = $container->get($controller);
-        $request = $container->get(ServerRequestInterface::class);
-        $annotations = ApiAnnotation::methodMetadata($controller, $action);
+        $controllerInstance = $this->container->get($controller);
+        $request = $this->container->get(ServerRequestInterface::class);
+        $annotations = array_merge(
+            ApiAnnotation::methodMetadata($controller, $action),
+            $this->globalParams()
+        );
         $header_rules = [];
         $query_rules = [];
         $body_rules = [];
@@ -42,14 +115,14 @@ class ValidationApi
                 $query_rules[$annotation->key] = $annotation->rule;
             }
             if ($annotation instanceof Body) {
-                $body_rules = $annotation->rules;
+                $body_rules = array_merge($body_rules, $annotation->rules);
             }
             if ($annotation instanceof FormData) {
                 $form_data_rules[$annotation->key] = $annotation->rule;
             }
         }
 
-        if (! array_filter(compact('header_rules', 'query_rules', 'body_rules', 'form_data_rules'))) {
+        if (!array_filter(compact('header_rules', 'query_rules', 'body_rules', 'form_data_rules'))) {
             return true;
         }
 
@@ -74,7 +147,7 @@ class ValidationApi
             if ($data === null) {
                 return [
                     $field_error_code => $error_code,
-                    $field_error_message => $error,
+                    $field_error_message => implode(PHP_EOL, $error),
                 ];
             }
         }
@@ -87,7 +160,7 @@ class ValidationApi
             if ($data === null) {
                 return [
                     $field_error_code => $error_code,
-                    $field_error_message => $error,
+                    $field_error_message => implode(PHP_EOL, $error),
                 ];
             }
             Context::set(ServerRequestInterface::class, $request->withQueryParams($data));
@@ -97,11 +170,11 @@ class ValidationApi
             [
                 $data,
                 $error,
-            ] = $this->check($body_rules, (array) json_decode($request->getBody()->getContents(), true), $controllerInstance);
+            ] = $this->check($body_rules, (array)json_decode($request->getBody()->getContents(), true), $controllerInstance);
             if ($data === null) {
                 return [
                     $field_error_code => $error_code,
-                    $field_error_message => $error,
+                    $field_error_message => implode(PHP_EOL, $error),
                 ];
             }
             Context::set(ServerRequestInterface::class, $request->withBody(new SwooleStream(json_encode($data))));
@@ -111,11 +184,11 @@ class ValidationApi
             [
                 $data,
                 $error,
-            ] = $this->check($form_data_rules, array_merge($request->getUploadedFiles(),$request->getParsedBody()), $controllerInstance);
+            ] = $this->check($form_data_rules, array_merge($request->getUploadedFiles(), $request->getParsedBody()), $controllerInstance);
             if ($data === null) {
                 return [
                     $field_error_code => $error_code,
-                    $field_error_message => $error,
+                    $field_error_message => implode(PHP_EOL, $error),
                 ];
             }
             Context::set(ServerRequestInterface::class, $request->withParsedBody($data));

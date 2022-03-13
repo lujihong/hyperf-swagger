@@ -7,10 +7,7 @@ namespace Hyperf\Apidoc\Annotation;
 use Hyperf\HttpServer\Annotation\Mapping;
 use Hyperf\Utils\Str;
 
-/**
- * @Annotation
- * @Target({"METHOD"})
- */
+#[Attribute(Attribute::TARGET_METHOD)]
 class RequestApi extends Mapping
 {
     public $path;

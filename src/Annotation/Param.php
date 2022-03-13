@@ -19,22 +19,19 @@ abstract class Param extends AbstractAnnotation
     public $description;
 
     /**
-     * readonly.
      * @var string
      */
-    public $name;
+    public readonly string $name;
 
     /**
-     * readonly.
      * @var bool
      */
-    public $required;
+    public readonly bool $required;
 
     /**
-     * readonly.
      * @var string
      */
-    public $type;
+    public readonly string $type;
 
     public function __construct($value = null)
     {

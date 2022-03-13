@@ -23,14 +23,17 @@ class ApiValidationMiddleware extends CoreMiddleware
     /**
      * @var RequestInterface
      */
-    protected $request;
+    protected RequestInterface $request;
 
     /**
      * @var HttpResponse
      */
-    protected $response;
+    protected HttpResponse $response;
 
-    protected $validationApi;
+    /**
+     * @var ValidationApi
+     */
+    protected ValidationApi $validationApi;
 
     public function __construct(ContainerInterface $container, HttpResponse $response, RequestInterface $request, ValidationApi $validation, Server $server)
     {

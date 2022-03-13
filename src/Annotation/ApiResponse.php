@@ -6,10 +6,7 @@ namespace Hyperf\Apidoc\Annotation;
 
 use Hyperf\Di\Annotation\AbstractAnnotation;
 
-/**
- * @Annotation
- * @Target({"METHOD"})
- */
+#[Attribute(Attribute::TARGET_METHOD)]
 class ApiResponse extends AbstractAnnotation
 {
     public $code;
